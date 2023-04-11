@@ -51,8 +51,8 @@ ENV DT_MODULE_TYPE="${REPO_NAME}" \
     DT_LAUNCHER="${LAUNCHER}"
 
 # Custom comands for detectron2
-#RUN pip install pyyaml==5.1
-RUN pip3 install torch torchvision 
+# RUN pip install pyyaml==5.1
+RUN pip3 install torch torchvision
 RUN pip install 'git+https://github.com/facebookresearch/detectron2.git'
 
 # install apt dependencies

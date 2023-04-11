@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python3
 import rospy
 from duckietown.dtros import DTROS, TopicType, NodeType
