@@ -2,7 +2,7 @@
   <name>detectron2_duckiebot_node</name>
   <version>0.1.0</version>
   <description>
-  This package is for Digit Detection .
+  This package is for detectron2_duckiebot_node.
   </description>
   <maintainer email="tianming@ualberta.ca">Tianming Han</maintainer>
   <maintainer email="alzebdeh@ualberta.ca">Leen Alzebdeh</maintainer>

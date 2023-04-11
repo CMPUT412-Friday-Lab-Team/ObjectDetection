@@ -156,7 +156,7 @@ class Detectron2_Duckiebot(DTROS):
         print(outputs)
         out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 
-        ret = self.send_compressed(self.digit_pub, self.seq, f'{HOST_NAME}/camera_optical_frame', out.get_image()[:, :, ::-1])
+        ret = self.send_compressed(self.img_pub, self.seq, f'{HOST_NAME}/camera_optical_frame', out.get_image()[:, :, ::-1])
         if ret:
             self.seq += 1
 
