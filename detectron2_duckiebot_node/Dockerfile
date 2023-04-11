@@ -50,6 +50,10 @@ ENV DT_MODULE_TYPE="${REPO_NAME}" \
     DT_LAUNCH_PATH="${LAUNCH_PATH}" \
     DT_LAUNCHER="${LAUNCHER}"
 
+# Custom comands for detectron2
+RUN python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
+RUN python -m pip install pyyaml==5.1
+
 # install apt dependencies
 COPY ./dependencies-apt.txt "${REPO_PATH}/"
 RUN dt-apt-install ${REPO_PATH}/dependencies-apt.txt
@@ -65,7 +69,7 @@ COPY ./packages "${REPO_PATH}/packages"
 
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
-  catkin build \
+    catkin build \
     --workspace ${CATKIN_WS_DIR}/
 
 # install launcher scripts

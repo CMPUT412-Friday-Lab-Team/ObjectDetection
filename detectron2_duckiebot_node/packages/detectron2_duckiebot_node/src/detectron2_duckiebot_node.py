@@ -10,16 +10,10 @@ import numpy as np
 import sys, os, distutils.core
 import math
 import cv2
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 import torch, detectron2
-import detectron2
 from detectron2.utils.logger import setup_logger
-import cv2, random, json
+import json
 from detectron2.utils.visualizer import ColorMode
-import rosbag
 
 # import some common detectron2 utilities
 from detectron2 import model_zoo
@@ -101,18 +95,6 @@ class Detectron2_Duckiebot(DTROS):
             msg.data = np.array(buffer).tostring()
             pub.publish(msg)
         return ret
-    
-    def install(self):
-
-        """# Install detectron2"""
-
-        os.system("python -m pip install pyyaml==5.1")
-        # Note: This is a faster way to install detectron2 in Colab, but it does not include all functionalities.
-        # See https://detectron2.readthedocs.io/tutorials/install.html for full installation instructions
-        os.path("!git clone 'https://github.com/facebookresearch/detectron2'")
-        dist = distutils.core.run_setup("./detectron2/setup.py")
-        os.path("!python -m pip install {' '.join([f"'{x}'" for x in dist.install_requires])}")
-        sys.path.insert(0, os.path.abspath('./detectron2'))
 
     def fine_tune_model(self):
 
@@ -169,9 +151,6 @@ class Detectron2_Duckiebot(DTROS):
 
 if __name__ == '__main__':
     detect_node = Detectron2_Duckiebot("detectron2_duckiebot")
-
-    """ run the first time you run this code, to install detectron2 """
-    detect_node.install()
 
     detect_node.fine_tune_model()
 
