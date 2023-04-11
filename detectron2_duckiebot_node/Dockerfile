@@ -53,6 +53,7 @@ ENV DT_MODULE_TYPE="${REPO_NAME}" \
 # Custom comands for detectron2
 RUN python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
 RUN python -m pip install pyyaml==5.1
+RUN pip3 install torch torchvision 
 
 # install apt dependencies
 COPY ./dependencies-apt.txt "${REPO_PATH}/"
