@@ -31,7 +31,8 @@ Original file is located at
     https://colab.research.google.com/drive/11jrZvjetAeoH7LiuMAOxTGTf1TEKwStf
 """
 
-OUTPUT_MODEL_PATH = "/content/output/model_final.pth" # "/content/drive/MyDrive/CMPUT412/Project/model_final.pth"
+rospack = rospkg.RosPack()
+OUTPUT_MODEL_PATH = rospack.get_path("detectron2_duckiebot_node") + "/src/model_final.pth" # "/content/drive/MyDrive/CMPUT412/Project/model_final.pth"
 BAG_FILE_PATH = "/content/drive/MyDrive/CMPUT412/Project/more_dataset_gen.bag"  # a bag file not in training set, for testing
 
 TIME_CUTOFF_MIN = 0 # 1681175162 #1681175159791011507
@@ -59,8 +60,8 @@ class Detectron2_Duckiebot(DTROS):
         """Detection Network variables"""
 
         TORCH_VERSION = ".".join(torch.__version__.split(".")[:2])
-        CUDA_VERSION = torch.__version__.split("+")[-1]
-        print("torch: ", TORCH_VERSION, "; cuda: ", CUDA_VERSION)
+        #CUDA_VERSION = torch.__version__.split("+")[-1]
+        #print("torch: ", TORCH_VERSION, "; cuda: ", CUDA_VERSION)
         print("detectron2:", detectron2.__version__)
 
         # Some basic setup:
@@ -105,6 +106,7 @@ class Detectron2_Duckiebot(DTROS):
 
         self.cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
         self.cfg.DATASETS.TRAIN = ("duckie_train",)
+        self.cfg.MODEL.DEVICE ="cpu"
         self.cfg.DATASETS.TEST = ()
         self.cfg.DATALOADER.NUM_WORKERS = 2
         self.cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")  # Let training initialize from model zoo
@@ -122,7 +124,7 @@ class Detectron2_Duckiebot(DTROS):
         """
         # Inference should use the config with parameters that are used in training
         # cfg now already contains everything we've set previously. We changed it a little bit for inference:
-        self.cfg.MODEL.WEIGHTS = os.path.join(self.cfg.OUTPUT_DIR, OUTPUT_MODEL_PATH)  # path to the model we just trained
+        self.cfg.MODEL.WEIGHTS = OUTPUT_MODEL_PATH # path to the model we just trained
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8   # set a custom testing threshold
         self.predictor = DefaultPredictor(self.cfg)
 
