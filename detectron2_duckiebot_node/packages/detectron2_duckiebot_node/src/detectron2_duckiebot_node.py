@@ -157,7 +157,7 @@ class Detectron2_Duckiebot(DTROS):
         pred_classes = outputs["instances"].get("pred_classes")
 
         msg = json.dumps({'class':pred_classes.tolist(),'pred_boxes': pred_boxes.tolist(), 'scores': scores.tolist()})
-        self.pub(String(json.dumps(msg)))
+        self.pub(String(msg))
 
 if __name__ == '__main__':
     detect_node = Detectron2_Duckiebot("detectron2_duckiebot")
