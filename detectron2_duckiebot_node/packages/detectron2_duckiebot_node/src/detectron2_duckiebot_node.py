@@ -22,6 +22,7 @@ from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.structures import BoxMode
 from detectron2.engine import DefaultTrainer
+import threading
 
 """Detectron2-Duckiebot.ipynb
 
@@ -48,9 +49,8 @@ class Detectron2_Duckiebot(DTROS):
 
         super(Detectron2_Duckiebot, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
         
-        self.sub = rospy.Subscriber(f'/{HOST_NAME}/camera_node/image/compressed', CompressedImage, self.callback)
-        self.pub = rospy.Publisher(f'/{HOST_NAME}/detectron2_duckiebot/detected_objects', String, queue_size=1)
-        self.img_pub = rospy.Publisher(f'/{HOST_NAME}/camera_node/image/object_detection/compressed', CompressedImage, queue_size=1)
+        self.lock = threading.Lock()
+
         self.veh = str(os.environ["VEHICLE_NAME"])
         self.seq = 0 
 
@@ -63,6 +63,10 @@ class Detectron2_Duckiebot(DTROS):
         #CUDA_VERSION = torch.__version__.split("+")[-1]
         #print("torch: ", TORCH_VERSION, "; cuda: ", CUDA_VERSION)
         print("detectron2:", detectron2.__version__)
+
+        self.sub = rospy.Subscriber(f'/{HOST_NAME}/camera_node/image/compressed', CompressedImage, self.callback)
+        self.pub = rospy.Publisher(f'/{HOST_NAME}/detectron2_duckiebot/detected_objects', String, queue_size=1)
+        self.img_pub = rospy.Publisher(f'/{HOST_NAME}/camera_node/image/object_detection/compressed', CompressedImage, queue_size=1)
 
         # Some basic setup:
         # Setup detectron2 logger
@@ -80,7 +84,9 @@ class Detectron2_Duckiebot(DTROS):
         # reference: http://wiki.ros.org/rospy_tutorials/Tutorials/WritingImagePublisherSubscriber
         compressed_image = np.frombuffer(msg.data, np.uint8)
         im = cv2.imdecode(compressed_image, cv2.IMREAD_COLOR)
+        self.lock.acquire()
         self.image = im
+        self.lock.release()
 
     def send_compressed(self,pub, seq, frame_id, im):
         msg = CompressedImage()
@@ -130,8 +136,11 @@ class Detectron2_Duckiebot(DTROS):
 
     def publish_detections(self):
 
-        outputs = self.predictor(self.image)
-        v = Visualizer(self.image[:, :, ::-1],
+        self.lock.acquire()
+        im = self.image
+        self.lock.release()
+        outputs = self.predictor(im)
+        v = Visualizer(im[:, :, ::-1],
                     metadata=self.duckie_metadata, 
                     scale=0.5, 
                     instance_mode=ColorMode.IMAGE_BW   # remove the colors of unsegmented pixels. This option is only available for segmentation models
@@ -157,7 +166,8 @@ if __name__ == '__main__':
 
     detect_node.inference()
 
-    detect_node.publish_detections()
+    while True:
+        detect_node.publish_detections()
 
 # image_count = 0
 # for topic, msg, t in bag.read_messages(topics=[f'/{HOST_NAME}/camera_node/image/compressed']):
