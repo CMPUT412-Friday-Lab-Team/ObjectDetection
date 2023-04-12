@@ -143,9 +143,9 @@ class Detectron2_Duckiebot(DTROS):
         if ret:
             self.seq += 1
 
-        pred_boxes = outputs["instances"]["pred_boxes"]
-        scores = outputs["instances"]["scores"]
-        pred_classes = outputs["instances"]["pred_classes"]
+        pred_boxes = outputs["instances"].get("pred_boxes")
+        scores = outputs["instances"].get("scores")
+        pred_classes = outputs["instances"].get("pred_classes")
 
         msg = {'class':pred_classes,'pred_boxes': pred_boxes, 'scores': scores}
         self.pub(String(json.dumps(msg)))
